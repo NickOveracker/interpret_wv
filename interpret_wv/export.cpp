@@ -207,7 +207,7 @@ parse_ucs::modfile export_modfile(const weaver::Project &proj) {
 	parse_ucs::attribute techAttr;
 	techAttr.valid = true;
 	techAttr.name = "tech";
-	techAttr.value = "\"" + proj.tech.path + "\"";
+	techAttr.value = "\"" + proj.tech.name + "\"";
 	result.attrs.push_back(techAttr);
 
 	return result;

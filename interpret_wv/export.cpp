@@ -1,3 +1,11 @@
+/*
+ * Changes in the WebAssembly fork.
+ * Modified in the WebAssembly fork of Loom, https://github.com/NickOveracker/loom
+ * (branch wasm; this library: https://github.com/NickOveracker/interpret_wv, branch wasm).
+ * Changes, with their dates:
+ *   2026-10-24  Write the technology's name into lm.mod, not its path
+ * End of the changes notice.
+ */
 #include <interpret_wv/export.h>
 
 #include <arithmetic/algorithm.h>
@@ -207,7 +215,15 @@ parse_ucs::modfile export_modfile(const weaver::Project &proj) {
 	parse_ucs::attribute techAttr;
 	techAttr.valid = true;
 	techAttr.name = "tech";
-	techAttr.value = "\"" + proj.tech.path + "\"";
+	// The technology by its name when it comes from the technology directory, as lm mod init
+	// sets it ("sky130"), since import.cpp reads the value back through Project::setTech,
+	// which turns an absolute path into one relative to the project ("../tech/sky130"),
+	// whose "/" then ends up in the names of the generated cells.
+	std::string tech = proj.tech.path;
+	if (not proj.tech.name.empty() and (proj.techDir / proj.tech.name).lexically_normal() == fs::path(proj.tech.path).lexically_normal()) {
+		tech = proj.tech.name;
+	}
+	techAttr.value = "\"" + tech + "\"";
 	result.attrs.push_back(techAttr);
 
 	return result;
